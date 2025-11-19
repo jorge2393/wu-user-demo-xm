@@ -6,7 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 
 const USDC_TOKEN = "usdc";
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "";
+const MOCK_UP_ADDRESS = process.env.NEXT_PUBLIC_MOCK_UP_ADDRESS || "";
 
 type TransferStatus = "idle" | "processing" | "success" | "error";
 
@@ -175,7 +175,7 @@ export function CashPickup() {
       return;
     }
 
-    if (!TREASURY_ADDRESS) {
+    if (!MOCK_UP_ADDRESS) {
       setTransferStatus("error");
       setTimeout(() => setTransferStatus("idle"), 3000);
       return;
@@ -186,7 +186,7 @@ export function CashPickup() {
       setTransactionHash(null);
 
       const txn = await wallet.send(
-        TREASURY_ADDRESS,
+        MOCK_UP_ADDRESS,
         USDC_TOKEN,
         amount.toString()
       );

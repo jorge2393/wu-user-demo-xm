@@ -8,7 +8,7 @@ export function TransactionHistory() {
   const [activity, setActivity] = useState<Activity | null>(null);
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const [cardLast4, setCardLast4] = useState<string | null>(null);
-  const TREASURY_ADDRESS = (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "").toLowerCase();
+  const MOCK_UP_ADDRESS = (process.env.NEXT_PUBLIC_MOCK_UP_ADDRESS || "").toLowerCase();
 
   useEffect(() => {
     if (!wallet) return;
@@ -170,7 +170,7 @@ export function TransactionHistory() {
                             />
                           </>
                         ) : (
-                          event.to_address?.toLowerCase() === TREASURY_ADDRESS
+                          event.to_address?.toLowerCase() === MOCK_UP_ADDRESS
                             ? "To Cash Pickup - NY Agent 2409"
                             : `To Credit Card · Ending ${cardLast4 ?? "••••"}`
                         )}

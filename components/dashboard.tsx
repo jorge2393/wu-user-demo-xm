@@ -138,9 +138,20 @@ export function Dashboard() {
                   </div>
 
                   <div className="flex items-center gap-2 justify-between">
-                    <span className="text-sm font-medium text-gray-500">
-                      Chain
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-500">
+                        Chain
+                      </span>
+                      <div className="relative group">
+                        <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center cursor-help">
+                          <span className="text-gray-500 text-xs font-medium">i</span>
+                        </div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-4 py-3 bg-gray-900 text-white text-xs rounded-md whitespace-normal w-[155px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                          This demo runs on Base Sepolia while Rain finalizes Solana support.<br /><br />Switching to Solana later will just be a simple chain toggle.
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                        </div>
+                      </div>
+                    </div>
                     <span className="text-sm text-gray-900 capitalize">
                       {wallet?.chain}
                     </span>
@@ -361,9 +372,20 @@ export function Dashboard() {
                     </span>
                   </div>
                    <div className="flex items-center gap-2 justify-between">
-                     <span className="text-sm font-medium text-gray-500">
-                       Chain
-                     </span>
+                     <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium text-gray-500">
+                         Chain
+                       </span>
+                       <div className="relative group">
+                         <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center cursor-help">
+                           <span className="text-gray-500 text-xs font-medium">i</span>
+                         </div>
+                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-normal max-w-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                           Heads up: This demo is currently built on Base Sepolia while Rain finalizes Solana support. Switching to Solana later will just be a simple chain toggle.
+                           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                         </div>
+                       </div>
+                     </div>
                      <span className="text-sm text-gray-900 capitalize text-nowrap overflow-auto">
                        {wallet?.chain}
                      </span>

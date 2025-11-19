@@ -5,21 +5,21 @@ import { cn } from "@/lib/utils";
 
 const features = [
   {
-    title: "Launch Fast",
+    title: "Receive Money",
     description:
-      "Integrate auth, create wallets, sponsor gas, and enable token transfers with just a few lines of code. No blockchain experience needed.",
+      "Get instant USDC transfers directly to your wallet. Balance updates automatically once transfers are processed.",
     iconPath: "/rocket.svg",
   },
   {
-    title: "Scale Big",
+    title: "Cash Pickup",
     description:
-      "All the APIs you need to power onramping, activity tracking, staking and more. Built to grow with you.",
+      "Request cash at Western Union agent locations. Select an agent, send funds, and show your QR code for pickup.",
     iconPath: "/trending-up.svg",
   },
   {
-    title: "Protect Your Assets",
+    title: "Credit Card",
     description:
-      "Smart wallets with onchain 2FA, flexible recovery methods, and no vendor lock-in. Secure and ready for what’s next.",
+      "Create and fund a Rain-powered credit card with USDC. View balances and securely access card details when needed.",
     iconPath: "/shield-check.svg",
   },
 ];
@@ -58,9 +58,9 @@ export function LandingPage({ isLoading }: { isLoading: boolean }) {
         {/* Content */}
         <div className="relative z-10 flex flex-col gap-12 text-white">
           <div className="flex flex-col gap-4">
-            <h1 className="text-6xl font-bold">Western Union Agent Demo</h1>
+            <h1 className="text-6xl font-bold">Western Union User Demo</h1>
             <p className="text-white/60 text-lg">
-            Sign in with email to create a smart wallet, claim payroll and offramp to a bank account or create + fund a Rain credit card.
+            Sign in with email to create a smart wallet, receive money transfers, request cash pickups, or create and fund a credit card.
             </p>
           </div>
 

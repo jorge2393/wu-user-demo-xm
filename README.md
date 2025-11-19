@@ -15,7 +15,7 @@ This demo demonstrates a Western Union agent interface built with Crossmint and 
 
 **Features:**
 - **Account Management**: View USDC balance on Base Sepolia
-- **Money Transfers**: Receive money transfers via Circle faucet
+- **Money Transfers**: Simulate money transfers via Circle faucet
 - **Cash Pickup**: Request cash pickup at Western Union agent locations
 - **Credit Cards**: Create and manage Rain-powered credit cards
 - **Card Funding**: Fund credit cards with USDC
@@ -50,13 +50,10 @@ cp .env.example .env
 **Required Variables:**
 - `NEXT_PUBLIC_CROSSMINT_API_KEY`: Get from [Crossmint Dashboard](https://docs.crossmint.com/introduction/platform/api-keys/client-side)
 - `NEXT_PUBLIC_CHAIN`: Set to `base-sepolia` for Base Sepolia testnet
+- `NEXT_PUBLIC_MOCK_UP_ADDRESS`: Mock up wallet address for cash pickup functionality
 - `RAIN_API_KEY`: Get from [Rain Dashboard](https://rain.xyz) for credit card functionality
-- `NEXT_PUBLIC_TREASURY_ADDRESS`: Treasury wallet address for offramp functionality
 - `CIRCLE_FAUCET_API_KEY`: Get from [Circle Developer Console](https://developers.circle.com/) for USDC faucet functionality (format: `TEST_API_KEY:...`)
 
-**Optional Variables:**
-- `NEXT_PUBLIC_BACKEND_URL`: Backend URL for salary claiming (defaults to demo mode)
-- `RAIN_API_BASE_URL`: Rain API base URL (defaults to `https://api-dev.raincards.xyz/v1`)
 
 **API Key Scopes Required:**
 - Crossmint: `users.create`, `users.read`, `wallets.read`, `wallets.create`, `wallets:transactions.create`, `wallets:transactions.sign`, `wallets:balance.read`, `wallets.fund`
@@ -90,7 +87,7 @@ bun dev
 
 ### 2) Cash Pickup
 - User selects an agent location and enters an amount.
-- A transaction is sent from the user's smart wallet to the treasury address (`NEXT_PUBLIC_TREASURY_ADDRESS`).
+- A transaction is sent from the user's smart wallet to the mock up address (`NEXT_PUBLIC_MOCK_UP_ADDRESS`).
 - First transaction requires an OTP flow to authorize the signature; subsequent transactions do not.
 - UI shows "Processing Request", confirms when on-chain success is detected, and generates a QR code for agent verification.
 
@@ -107,7 +104,7 @@ bun dev
 ### Environment Summary
 - `NEXT_PUBLIC_CROSSMINT_API_KEY`,
 - `NEXT_PUBLIC_CHAIN` (Base Sepolia),
-- `NEXT_PUBLIC_TREASURY_ADDRESS` (for offramp),
+- `NEXT_PUBLIC_MOCK_UP_ADDRESS` (for cash pickup),
 - `RAIN_API_KEY`,
 - `CIRCLE_FAUCET_API_KEY` (for money transfer functionality).
 
