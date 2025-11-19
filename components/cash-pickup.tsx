@@ -476,44 +476,65 @@ export function CashPickup() {
             </div>
 
             {/* Amount Input */}
-            <div className="relative">
-              <span
-                className={cn(
-                  "absolute left-0 top-0 text-4xl font-bold pointer-events-none",
-                  amount && amount > 0 ? "text-gray-900" : "text-gray-400"
-                )}
-              >
-                $
-              </span>
-              <input
-                type="number"
-                inputMode="decimal"
-                min="0"
-                step="0.01"
-                value={amountInput}
-                className={cn(
-                  "text-4xl font-bold bg-transparent border-none outline-none w-full pl-8 placeholder-gray-400 placeholder-opacity-100 focus:placeholder-gray-400 focus:placeholder-opacity-100",
-                  amount && amount > 0 ? "text-gray-900" : "text-gray-400 focus:text-gray-400"
-                )}
-                placeholder="0.00"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setAmountInput(value);
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Enter amount to send
+              </label>
+              <div className="relative">
+                <span
+                  className={cn(
+                    "absolute left-0 top-0 text-4xl font-bold pointer-events-none",
+                    amount && amount > 0 ? "text-gray-900" : "text-gray-400"
+                  )}
+                >
+                  $
+                </span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={amountInput}
+                  className={cn(
+                    "text-4xl font-bold bg-transparent border-none outline-none w-full pl-8 placeholder-gray-400 placeholder-opacity-100 focus:placeholder-gray-400 focus:placeholder-opacity-100",
+                    amount && amount > 0 ? "text-gray-900" : "text-gray-400 focus:text-gray-400"
+                  )}
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setAmountInput(value);
 
-                  if (value === "") {
-                    setAmount(null);
-                  } else {
-                    const numValue = parseFloat(value);
-                    if (!isNaN(numValue)) {
-                      setAmount(numValue);
+                    if (value === "") {
+                      setAmount(null);
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue)) {
+                        setAmount(numValue);
+                      }
                     }
-                  }
-                }}
-                style={{
-                  fontFamily: "inherit",
-                }}
-              />
+                  }}
+                  style={{
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
             </div>
+
+            {/* Fees Display */}
+            {amount && amount > 0 ? (
+              <div className="mt-4 mb-6 space-y-1">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>Fee (3%)</span>
+                  <span>${(amount * 0.03).toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between text-base font-semibold text-gray-900 pt-1 border-t border-gray-200">
+                  <span>You will receive</span>
+                  <span>${(amount * 0.97).toFixed(2)} in cash</span>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 mb-6"></div>
+            )}
 
             {/* Send Cash Request Button */}
             <button
