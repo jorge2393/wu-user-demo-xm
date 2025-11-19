@@ -46,9 +46,8 @@ export function ReceiveTransfer() {
         const balances = await wallet.balances([USDXM_TOKEN]);
         setBalances(balances);
         
-        const hasBalance = (balances?.usdxm && Number(balances.usdxm.amount) > 0) ||
-          (balances?.tokens?.find((token) => token.symbol?.toLowerCase() === "usdxm") && 
-           Number(balances.tokens.find((token) => token.symbol?.toLowerCase() === "usdxm")?.amount || 0) > 0);
+        const usdxmToken = balances?.tokens?.find((token) => token.symbol?.toLowerCase() === "usdxm");
+        const hasBalance = usdxmToken && Number(usdxmToken.amount || 0) > 0;
         
         if (hasBalance) {
           setIsPolling(false);
@@ -90,9 +89,6 @@ export function ReceiveTransfer() {
   };
 
   const getUSDXMBalance = () => {
-    if (balances?.usdxm) {
-      return formatBalance(balances.usdxm.amount);
-    }
     const usdxmToken = balances?.tokens?.find(
       (token) => token.symbol?.toLowerCase() === "usdxm"
     );
