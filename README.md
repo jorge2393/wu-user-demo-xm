@@ -4,21 +4,21 @@
 <img width="200" alt="Image" src="https://github.com/user-attachments/assets/8b617791-cd37-4a5a-8695-a7c9018b7c70" />
 <br>
 <br>
-<h1>Caribe Express Demo</h1>
+<h1>Western Union Agent Demo</h1>
 
 <br>
 <br>
 </div>
 
 ## Introduction
-This quickstart demonstrates a simple payroll wallet built with Crossmint and Rain. Users sign in with email to auto‑create a smart wallet, claim payroll (backend funds the wallet), offramp to a treasury, or create and fund a Rain virtual card—then view balances, activity, and securely reveal card details.
+This demo demonstrates a Western Union agent interface built with Crossmint and Rain. Users sign in with email to auto‑create a smart wallet, receive money transfers, request cash pickups, or create and fund a Rain credit card—then view balances, activity, and securely reveal card details.
 
 **Features:**
 - **Account Management**: View USDC balance on Base Sepolia
-- **Salary Claiming**: One-click salary claiming with backend integration
-- **Bank Offramp**: Send USDC to treasury with bank transfer processing
-- **Virtual Cards**: Create and manage Rain-powered virtual cards
-- **Card Funding**: Fund virtual cards with USDC
+- **Money Transfers**: Receive money transfers via Circle faucet
+- **Cash Pickup**: Request cash pickup at Western Union agent locations
+- **Credit Cards**: Create and manage Rain-powered credit cards
+- **Card Funding**: Fund credit cards with USDC
 - **Card Details**: Securely reveal PAN and CVC using RSA/AES encryption
 - **Transaction History**: View recent wallet activity
 
@@ -26,7 +26,7 @@ This quickstart demonstrates a simple payroll wallet built with Crossmint and Ra
 ## Setup
 1. Clone the repository and navigate to the project folder:
 ```bash
-git clone https://github.com/jorge2393/caribe-express-demo.git && cd wallets-quickstart
+git clone https://github.com/jorge2393/wu-user-demo.git && cd wu-user-demo
 ```
 
 2. Install all dependencies:
@@ -50,8 +50,9 @@ cp .env.example .env
 **Required Variables:**
 - `NEXT_PUBLIC_CROSSMINT_API_KEY`: Get from [Crossmint Dashboard](https://docs.crossmint.com/introduction/platform/api-keys/client-side)
 - `NEXT_PUBLIC_CHAIN`: Set to `base-sepolia` for Base Sepolia testnet
-- `RAIN_API_KEY`: Get from [Rain Dashboard](https://rain.xyz) for virtual card functionality
+- `RAIN_API_KEY`: Get from [Rain Dashboard](https://rain.xyz) for credit card functionality
 - `NEXT_PUBLIC_TREASURY_ADDRESS`: Treasury wallet address for offramp functionality
+- `CIRCLE_FAUCET_API_KEY`: Get from [Circle Developer Console](https://developers.circle.com/) for USDC faucet functionality (format: `TEST_API_KEY:...`)
 
 **Optional Variables:**
 - `NEXT_PUBLIC_BACKEND_URL`: Backend URL for salary claiming (defaults to demo mode)
@@ -82,23 +83,21 @@ bun dev
 - On first login, a smart wallet is created automatically with an email-based signer.
 
 
-### 1) Claim Payroll (Funding Wallet from Backend)
-- User clicks “Claim Payroll”.
-- Frontend sends the user’s wallet address to your backend (`/api/claim-salary`).
-- Your backend submits a blockchain transaction on Base Sepolia using:
-  - Crossmint API Signer (recommended for the demo), or
-  - A server-managed keypair signer (alternative).
+### 1) Receive Money Transfer
+- User clicks "Receive Money Transfer".
+- Frontend calls Circle Faucet API to request USDC tokens.
+- Balance updates automatically once the transfer is processed.
 
-### 2) Offramp to Bank Account (Treasury)
-- User enters an amount and clicks “Offramp to Bank”.
-- A transaction is sent from the user’s smart wallet back to the treasury address (`NEXT_PUBLIC_TREASURY_ADDRESS`).
-- First transaction requires an OTP flow to authorize the signature; subsequent will not. We’re working toward skipping OTP for the first one as well.
-- UI shows “Processing Request”, confirms when on-chain success is detected, then resets.
+### 2) Cash Pickup
+- User selects an agent location and enters an amount.
+- A transaction is sent from the user's smart wallet to the treasury address (`NEXT_PUBLIC_TREASURY_ADDRESS`).
+- First transaction requires an OTP flow to authorize the signature; subsequent transactions do not.
+- UI shows "Processing Request", confirms when on-chain success is detected, and generates a QR code for agent verification.
 
-### 3) Virtual Card via Rain
+### 3) Credit Card via Rain
 1. KYC (demo-bypassed): Create a Rain user (returns `userId`).
 2. Create Rain smart contract for the user on Base Sepolia.
-3. Issue a virtual card for the user (status active).
+3. Issue a credit card for the user (status active).
 4. Fund the card by sending USDC from the user’s smart wallet to the contract’s deposit address.
 5. Poll Rain endpoints to reflect spending power/balance on the card.
 6. Reveal card details (PAN/CVC) via secure RSA public-key handshake + AES-128-GCM decryption, performed on server-side API routes.
@@ -110,5 +109,5 @@ bun dev
 - `NEXT_PUBLIC_CHAIN` (Base Sepolia),
 - `NEXT_PUBLIC_TREASURY_ADDRESS` (for offramp),
 - `RAIN_API_KEY`,
-- `NEXT_PUBLIC_BACKEND_URL` (optional - your server for Claim Payroll).
+- `CIRCLE_FAUCET_API_KEY` (for money transfer functionality).
 

@@ -37,12 +37,11 @@ export function VirtualCard() {
   const [cardSecrets, setCardSecrets] = useState<{ cardNumber: string; cvc: string } | null>(null);
   const [showSecrets, setShowSecrets] = useState<boolean>(false);
 
-  // Poll card balance when card is created (with timeout)
   useEffect(() => {
     if (cardStatus !== 'created' || !rainUserId) return;
 
     let pollCount = 0;
-    const maxPolls = 60; // Stop after 5 minutes (60 * 5 seconds)
+    const maxPolls = 60;
     let lastBalance = cardBalance?.current || 0;
 
     const pollBalance = async () => {
@@ -50,23 +49,20 @@ export function VirtualCard() {
         const response = await fetch(`/api/rain/users/${rainUserId}/balances`);
         if (response.ok) {
           const balance = await response.json();
-          // Map spendingPower to displayed balance
           setCardBalance({ currency: 'USD', available: balance.spendingPower, current: balance.spendingPower });
           
-          // Stop polling if balance hasn't changed and we've polled at least 6 times (30 seconds)
           if (pollCount >= 6 && balance.current === lastBalance) {
-            console.log('Card balance stable, stopping automatic polling');
-            return false; // Signal to stop polling
+            return false;
           }
           
           lastBalance = balance.current;
         }
       } catch (error) {
-        console.error('Error polling card balance:', error);
+        // Error polling card balance
       }
       
       pollCount++;
-      return pollCount < maxPolls; // Continue if under max polls
+      return pollCount < maxPolls;
     };
 
     pollBalance();
@@ -80,7 +76,6 @@ export function VirtualCard() {
     return () => clearInterval(interval);
   }, [cardStatus, cardData]);
 
-  // Poll transaction status after funding (copy from offramp)
   useEffect(() => {
     if (fundStatus !== "processing" || !fundTransactionHash || !wallet) return;
 
@@ -101,7 +96,7 @@ export function VirtualCard() {
           setFundStatus("success");
         }
       } catch (err) {
-        console.error("Error polling fund transaction activity:", err);
+        // Error polling fund transaction activity
       }
     };
 
@@ -121,13 +116,12 @@ export function VirtualCard() {
     };
   }, [fundStatus, fundTransactionHash, wallet]);
 
-  // Poll balance after successful funding
   useEffect(() => {
     if (fundStatus !== "success" || !rainUserId) return;
 
     let cancelled = false;
     let pollCount = 0;
-    const maxPolls = 12; // 1 min at 10s + 2 min at 30s = 6 + 6 = 12 polls
+    const maxPolls = 12;
     let lastBalance = cardBalance?.current || 0;
 
     const pollBalance = async () => {
@@ -138,7 +132,6 @@ export function VirtualCard() {
           const newBalance = balance.spendingPower;
           setCardBalance({ currency: 'USD', available: newBalance, current: newBalance });
           
-          // Stop if balance changed or we've polled enough
           if (newBalance !== lastBalance || pollCount >= maxPolls) {
             if (cancelled) return false;
             return false;
@@ -147,14 +140,13 @@ export function VirtualCard() {
           lastBalance = newBalance;
         }
       } catch (error) {
-        console.error('Error polling fund balance:', error);
+        // Error polling fund balance
       }
       
       pollCount++;
       return pollCount < maxPolls;
     };
 
-    // Poll every 10s for first minute, then every 30s
     const getInterval = () => pollCount < 6 ? 10000 : 30000;
     
     const pollAndSchedule = async () => {
@@ -192,7 +184,6 @@ export function VirtualCard() {
     setError(null);
     
     try {
-      // Step 1: Start Rain application
       const applicationResponse = await fetch('/api/rain/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -208,12 +199,10 @@ export function VirtualCard() {
 
       const application = await applicationResponse.json();
       
-      // KYC bypass: treat as approved in dev
       if (application.applicationStatus !== 'approved') {
         application.applicationStatus = 'approved';
       }
 
-      // Step 2: Create Rain smart contract on Base Sepolia (idempotent)
       try {
         await fetch(`/api/rain/users/${application.rainUserId}/contracts`, {
           method: 'POST',
@@ -224,7 +213,6 @@ export function VirtualCard() {
         });
       } catch {}
 
-      // Step 3: Create virtual card
       const cardResponse = await fetch(`/api/rain/users/${application.rainUserId}/cards`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -234,7 +222,7 @@ export function VirtualCard() {
       });
 
       if (!cardResponse.ok) {
-        throw new Error('Failed to create virtual card');
+        throw new Error('Failed to create credit card');
       }
 
       const card = await cardResponse.json();
@@ -246,7 +234,6 @@ export function VirtualCard() {
       setCardStatus('created');
       setRainUserId(application.rainUserId as string);
 
-      // Fetch and display the user's Rain Base Sepolia deposit address
       try {
         const contractsRes = await fetch(`/api/rain/users/${application.rainUserId}/contracts`);
         if (contractsRes.ok) {
@@ -254,7 +241,6 @@ export function VirtualCard() {
           if (json?.depositAddress) {
             const addr = String(json.depositAddress);
             setDepositAddress(addr);
-            // Publish to dashboard without caching
             try { window.dispatchEvent(new CustomEvent('rain:depositAddress', { detail: addr })); } catch {}
           }
         }
@@ -278,7 +264,6 @@ export function VirtualCard() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (response.status === 400) {
-          // Check if it's a card activation issue
           if (errorData.message && errorData.message.includes('non-active card')) {
             setError('Card is not active yet. Please wait a moment and try again, or the card may need to be activated.');
           } else {
@@ -314,7 +299,6 @@ export function VirtualCard() {
       setFundStatus("processing");
       setFundTransactionHash(null);
 
-      // Send USDC to deposit address (same pattern as offramp)
       const txn = await wallet.send(
         depositAddress,
         "usdc", // USDC token
@@ -346,11 +330,11 @@ export function VirtualCard() {
   return (
     <div className="bg-white rounded-2xl border shadow-sm p-6 flex flex-col h-full">
       <div className="flex flex-col gap-4 flex-1">
-        {/* Top Section: Top Up Virtual Card */}
+        {/* Top Section: Top Up Credit Card */}
         <div className="flex flex-col gap-4">
           {/* Header - aligned with other sections */}
           <div className="flex items-center gap-3 min-h-[28px]">
-            <h3 className="text-lg font-semibold">Top Up Virtual Card</h3>
+            <h3 className="text-lg font-semibold">Top Up Credit Card</h3>
           </div>
 
           {cardStatus === 'created' ? (
@@ -380,7 +364,7 @@ export function VirtualCard() {
                       Card Funded Successfully
                     </h4>
                     <p className="text-sm text-gray-500">
-                      Your virtual card has been funded and is ready to use
+                      Your credit card has been funded and is ready to use
                     </p>
                   </div>
                 </div>
@@ -417,7 +401,7 @@ export function VirtualCard() {
                       "w-full py-3 px-4 rounded-full text-sm font-medium transition-colors",
                       isFundLoading || !fundAmount || isFundSuccess
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-[#038de1] text-white hover:bg-[#0279bf]"
+                        : "bg-[#FFE327] text-black hover:bg-[#FFD700]"
                     )}
                     onClick={handleFundCard}
                     disabled={isFundLoading || !fundAmount || isFundSuccess}
@@ -445,7 +429,7 @@ export function VirtualCard() {
 
                 <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-sm opacity-80">Virtual Card</p>
+                  <p className="text-sm opacity-80">Credit Card</p>
                   <p className="text-lg font-semibold">
                     <span className="bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent">
                       {showSecrets && cardSecrets 
@@ -456,10 +440,10 @@ export function VirtualCard() {
                   </p>
                 </div>
                 <Image
-                  src="/caribeExpress-logo-white.png"
-                  alt="Caribe Express"
-                  width={68}
-                  height={68}
+                  src="/white-WU.png"
+                  alt="Western Union Logo"
+                  width={48}
+                  height={48}
                   className="absolute top-3.5 right-3.5 rounded z-10"
                 />
               </div>
@@ -525,7 +509,7 @@ export function VirtualCard() {
                 Creating Card
               </h4>
               <p className="text-sm text-gray-500">
-                Please wait while we create your virtual card...
+                Please wait while we create your credit card...
               </p>
             </div>
           </div>
@@ -572,19 +556,19 @@ export function VirtualCard() {
                 "w-full py-3 px-4 rounded-full text-sm font-medium transition-colors",
                 cardStatus !== 'idle'
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gray-900 text-white hover:bg-gray-800"
+                  : "bg-[#FFE327] text-black hover:bg-[#FFD700]"
               )}
               onClick={handleCreateCard}
               disabled={cardStatus !== 'idle'}
             >
-              {cardStatus !== 'idle' ? "Creating Card..." : "Create Virtual Card"}
+              {cardStatus !== 'idle' ? "Creating Card..." : "Create Credit Card"}
             </button>
 
             {/* Card Preview Placeholder - Greyed out */}
             <div className="relative bg-gray-300 rounded-xl p-6 text-gray-500 opacity-50">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-sm">Virtual Card</p>
+                  <p className="text-sm">Credit Card</p>
                   <p className="text-lg font-semibold">•••• •••• •••• ••••</p>
                 </div>
                 <div className="w-8 h-8 bg-gray-400 rounded"></div>

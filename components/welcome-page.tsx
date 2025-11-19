@@ -58,9 +58,9 @@ export function LandingPage({ isLoading }: { isLoading: boolean }) {
         {/* Content */}
         <div className="relative z-10 flex flex-col gap-12 text-white">
           <div className="flex flex-col gap-4">
-            <h1 className="text-6xl font-bold">Caribe Express Demo</h1>
+            <h1 className="text-6xl font-bold">Western Union Agent Demo</h1>
             <p className="text-white/60 text-lg">
-            Sign in with email to create a smart wallet, claim payroll and offramp to a bank account or create + fund a Rain virtual card.
+            Sign in with email to create a smart wallet, claim payroll and offramp to a bank account or create + fund a Rain credit card.
             </p>
           </div>
 

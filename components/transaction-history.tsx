@@ -21,34 +21,29 @@ export function TransactionHistory() {
         const activity = await wallet.experimental_activity();
         setActivity(activity);
       } catch (error) {
-        // swallow network errors to avoid error overlay
-        console.error("Failed to fetch activity:", error);
+        // Failed to fetch activity
       } finally {
         setHasInitiallyLoaded(true);
       }
     };
 
     fetchActivity();
-    // Poll every 10s—txns may take a few seconds to appear; 10s is a good balance.
     const interval = setInterval(() => {
       fetchActivity();
     }, 10000);
     return () => clearInterval(interval);
   }, [wallet]);
 
-  // Fetch Rain card last4 for labeling outbound txs to Virtual Card
   useEffect(() => {
     const loadCardLast4 = async () => {
       try {
         if (!wallet?.address) return;
-        // Fallback from localStorage first (set by virtual card flow)
         try {
           const cached = localStorage.getItem('rainCardLast4');
           if (cached) {
             setCardLast4(cached);
           }
         } catch {}
-        // Get Rain user for this wallet (creates if missing)
         const authResponse = await fetch('/api/rain/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -97,115 +92,134 @@ export function TransactionHistory() {
     }
   };
 
-  return (
-    <div className="bg-white rounded-2xl border shadow-sm p-6 flex flex-col h-full">
-      <div className="flex flex-col h-full">
-        <h3 className="text-lg font-semibold mb-4">Activity</h3>
+  const senders = [
+    { name: "Mario Silva", country: "Brazil", flag: "/brazil-.png" },
+    { name: "Jacinto Rodriguez", country: "Spain", flag: "/spain.png" },
+    { name: "Naledi Molefe", country: "Kenya", flag: "/kenya.png" },
+  ];
 
-        {!hasInitiallyLoaded ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-gray-500 text-sm">Loading activity...</div>
-          </div>
-        ) : activity?.events && activity.events.length > 0 ? (
-          <div className="flex-1 overflow-hidden">
-            <div className="max-h-[378px] overflow-y-auto space-y-3">
-              {activity.events.map((event, index) => {
-                const isIncoming =
-                  event.to_address.toLowerCase() ===
-                  wallet?.address.toLowerCase();
-                return (
-                  <div
-                    key={event.transaction_hash}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg transition-colors",
-                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center",
+  const getSender = (index: number) => {
+    return senders[index % senders.length];
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <h3 className="text-lg font-semibold mb-4">Activity</h3>
+
+      {!hasInitiallyLoaded ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-gray-500 text-sm">Loading activity...</div>
+        </div>
+      ) : activity?.events && activity.events.length > 0 ? (
+        <div className="flex-1 overflow-hidden">
+          <div className="max-h-[378px] overflow-y-auto space-y-3">
+            {activity.events.map((event, index) => {
+              const isIncoming =
+                event.to_address.toLowerCase() ===
+                wallet?.address.toLowerCase();
+              return (
+                <div
+                  key={event.transaction_hash}
+                  className={cn(
+                    "flex items-center justify-between p-3 rounded-lg transition-colors",
+                    index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center",
+                        isIncoming
+                          ? "bg-green-100 text-green-600"
+                          : "bg-blue-100 text-blue-600"
+                      )}
+                    >
+                      <Image
+                        src={
                           isIncoming
-                            ? "bg-green-100 text-green-600"
-                            : "bg-blue-100 text-blue-600"
+                            ? "/arrow-down.svg"
+                            : "/arrow-up-right.svg"
+                        }
+                        alt={isIncoming ? "arrow-down" : "arrow-up-right"}
+                        className={cn(
+                          isIncoming ? "filter-green" : "filter-blue"
                         )}
-                      >
-                        <Image
-                          src={
-                            isIncoming
-                              ? "/arrow-down.svg"
-                              : "/arrow-up-right.svg"
-                          }
-                          alt={isIncoming ? "arrow-down" : "arrow-up-right"}
-                          className={cn(
-                            isIncoming ? "filter-green" : "filter-blue"
-                          )}
-                          width={16}
-                          height={16}
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {isIncoming ? "Received" : "Sent"}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {formatTimestamp(event.timestamp)}
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {isIncoming
-                            ? "From GlobalTech - Contract"
-                            : (event.to_address?.toLowerCase() === TREASURY_ADDRESS
-                                ? "To NovaBank · Ending 9820"
-                                : `To Virtual Card · Ending ${cardLast4 ?? "••••"}`)}
-                        </div>
-                      </div>
+                        width={16}
+                        height={16}
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-right">
-                        <div
-                          className={cn(
-                            "text-sm font-medium",
-                            isIncoming ? "text-green-600" : "text-primary"
-                          )}
-                        >
-                          {isIncoming ? "+" : "-"}${event.amount}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          USD
-                        </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {isIncoming ? "Received" : "Sent"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {formatTimestamp(event.timestamp)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1.5">
+                        {isIncoming ? (
+                          <>
+                            <span>From {getSender(index).name} - {getSender(index).country}</span>
+                            <Image
+                              src={getSender(index).flag}
+                              alt={getSender(index).country}
+                              width={14}
+                              height={10}
+                              className="inline-block"
+                            />
+                          </>
+                        ) : (
+                          event.to_address?.toLowerCase() === TREASURY_ADDRESS
+                            ? "To Cash Pickup - NY Agent 2409"
+                            : `To Credit Card · Ending ${cardLast4 ?? "••••"}`
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div
+                        className={cn(
+                          "text-sm font-medium",
+                          isIncoming ? "text-green-600" : "text-primary"
+                        )}
+                      >
+                        {isIncoming ? "+" : "-"}${event.amount}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        USD
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-            <h4 className="font-medium text-primary mb-2">
-              Your activity feed
-            </h4>
-            <p className="text-gray-500 text-sm mb-4">
-              Your salary claims and bank transfers will show up here. Get started by
-              claiming your salary
-            </p>
-            <button
-              onClick={() => {
-                // Trigger the fund function from balance component
-                const fundButton = document.querySelector("[data-fund-button]");
-                if (fundButton instanceof HTMLElement) {
-                  fundButton.click();
-                }
-              }}
-              className="px-6 py-2.5 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
-            >
-              Claim Salary
-            </button>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+          <h4 className="font-medium text-primary mb-2">
+            Your activity feed
+          </h4>
+          <p className="text-gray-500 text-sm mb-4">
+            Your salary claims and bank transfers will show up here. Get started by
+            claiming your salary
+          </p>
+          <button
+            onClick={() => {
+              // Trigger the fund function from balance component
+              const fundButton = document.querySelector("[data-fund-button]");
+              if (fundButton instanceof HTMLElement) {
+                fundButton.click();
+              }
+            }}
+            className="px-6 py-2.5 rounded-full text-sm font-medium bg-[#FFE327] text-black hover:bg-[#FFD700] transition-colors"
+          >
+              Simulate transfer
+          </button>
+        </div>
+      )}
     </div>
   );
 }

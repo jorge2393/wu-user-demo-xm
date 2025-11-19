@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wallets Quickstart",
+  title: "Western Union Agent Demo",
   description: "A quickstart for wallets",
 };
 

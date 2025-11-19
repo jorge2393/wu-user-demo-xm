@@ -115,4 +115,9 @@
     transform: scale(1.05);
     transition: opacity 400ms ease-in, transform 400ms ease-in;
   }
+
+  /* Safe area insets for mobile devices */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

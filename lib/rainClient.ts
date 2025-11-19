@@ -114,7 +114,7 @@ class RainClient {
     });
   }
 
-  // Create virtual card for approved customer (match demo payload)
+  // Create credit card for approved customer (match demo payload)
   async createCardForUser(
     userId: string,
     params: { displayName?: string; limitAmount?: number; status?: 'notActivated' | 'active' }

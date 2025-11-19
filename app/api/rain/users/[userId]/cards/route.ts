@@ -8,7 +8,7 @@ const cardStore = new Map<string, string>(); // rainUserId -> rainCardId
  * Rain User Cards API
  * 
  * GET  - List cards for a user
- * POST - Create a new virtual card for a user
+ * POST - Create a new credit card for a user
  */
 export async function GET(
   request: NextRequest,
